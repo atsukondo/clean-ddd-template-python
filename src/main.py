@@ -5,12 +5,12 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 from starlette.responses import Response
 
-from config import Settings, settings
+from config import Setting, settings
 from utils.logger import setup_logger
 
 
 class RequestLoggerMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: ASGIApp, settings: Settings):
+    def __init__(self, app: ASGIApp, settings: Setting):
         super().__init__(app)
         self.settings = settings
 
@@ -58,6 +58,9 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.add_middleware(RequestLoggerMiddleware, settings=settings)
+
+    from application.endpoint import router as user_router
+    app.include_router(user_router, prefix="/api/v1/users", tags=["users"])
 
     return app
 
